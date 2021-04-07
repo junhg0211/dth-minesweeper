@@ -1,0 +1,14 @@
+.main-container {
+    max-width: 720px;
+    margin: auto;
+    background-color: #dddddd;
+}
+
+.main-container p {
+    text-align: justify;
+}
+
+#main-canvas {
+    width: 720px;
+    height: 720px;
+}
