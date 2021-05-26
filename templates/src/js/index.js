@@ -10,7 +10,9 @@ let cellSize;
 let horizontalPadding = 120,
     verticalPadding = 50;
 
-let nowClick = false;
+let nowClick = false,
+    nowMouseX = 0,
+    nowMouseY = 0;
 
 let board
 
@@ -24,6 +26,7 @@ function boardInit() {
         board.push(row);
     }
 }
+
 boardInit();
 
 function resize() {
@@ -45,8 +48,20 @@ function mouseup(e) {
     nowClick = false;
 
     let position = getCellPositionFromClient(e.clientX, e.clientY);
+    let nowMousePosition = getCellPositionFromClient(nowMouseX, nowMouseY);
     // noinspection JSCheckFunctionSignatures
-    board[parseInt(position.y)][parseInt(position.x)] = 1;
+    let positionX = parseInt(nowMousePosition.x),
+                positionY = parseInt(nowMousePosition.y);
+    if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
+            && positionX < rowCount && positionY < rowCount) {
+        // noinspection JSCheckFunctionSignatures
+        board[parseInt(position.y)][parseInt(position.x)] = 1;
+    }
+}
+
+function mousemove(e) {
+    nowMouseX = e.clientX;
+    nowMouseY = e.clientY;
 }
 
 function tick() {
@@ -54,22 +69,35 @@ function tick() {
 }
 
 function getClientPositionFromCell(x, y) {
-    return {'x': gameX + x * cellSize, 'y': gameY + y * cellSize}
+    return {x: gameX + x * cellSize, y: gameY + y * cellSize}
 }
 
 function getCellPositionFromClient(x, y) {
-    return {'x': (x - gameX) / cellSize, 'y': (y - gameY) / cellSize}
+    return {x: (x - gameX) / cellSize, y: (y - gameY) / cellSize}
 }
 
 function render() {
-    context.fillStyle = 'lightgray';
+    context.fillStyle = "lightgray";
     context.fillRect(0, 0, canvas.width, canvas.height);
+
+    let nowMousePosition = getCellPositionFromClient(nowMouseX, nowMouseY);
 
     for (let y = 0; y < rowCount; y++) {
         for (let x = 0; x < rowCount; x++) {
-            if (board[y][x] === 1) {
-                let position = getClientPositionFromCell(x, y);
+            let position = getClientPositionFromCell(x, y);
+            let positionX = parseInt(nowMousePosition.x),
+                positionY = parseInt(nowMousePosition.y);
 
+
+            // noinspection JSCheckFunctionSignatures
+            if (x === positionX && y === positionY
+                    && !Object.is(positionX, -0) && !Object.is(positionY, -0)
+                    && nowClick) {
+                context.fillStyle = "white";
+                context.fillRect(position.x, position.y, cellSize, cellSize)
+            }
+
+            if (board[y][x] === 1) {
                 context.fillStyle = "black";
                 context.fillRect(position.x, position.y, cellSize, cellSize)
             }
@@ -90,14 +118,15 @@ function render() {
         context.stroke();
     }
 
-    context.strokeStyle = 'black';
+    context.strokeStyle = "black";
     context.strokeRect(gameX, gameY, gameHeight, gameHeight);
 }
 
-window.addEventListener('resize', resize);
+window.addEventListener("resize", resize);
 resize();
-window.addEventListener('mousedown', mousedown);
-window.addEventListener('mouseup', mouseup);
+window.addEventListener("mousedown", mousedown);
+window.addEventListener("mouseup", mouseup);
+window.addEventListener("mousemove", mousemove);
 
 setInterval(() => {
     tick();
