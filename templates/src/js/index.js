@@ -3,9 +3,12 @@ const fps = 30;
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
+const imageMine = document.getElementById("image-mine");
+
 let rowCount = 9, gameHeight;
 let gameX, gameY;
 let cellSize;
+let mineCount = 10;
 
 let horizontalPadding = 120,
     verticalPadding = 50;
@@ -14,16 +17,31 @@ let nowClick = false,
     nowMouseX = 0,
     nowMouseY = 0;
 
-let board
+let board,
+    showingCells;
 
 function boardInit() {
     board = [];
+    showingCells = [];
     for (let i = 0; i < rowCount; i++) {
-        let row = [];
+        let row = [],
+            showingRow = [];
         for (let j = 0; j < rowCount; j++) {
-            row.push(0)
+            row.push(0);
+            showingRow.push(false);
         }
         board.push(row);
+        showingCells.push(showingRow);
+    }
+
+    for (let i = 0; i < mineCount;) {
+        // noinspection JSCheckFunctionSignatures
+        let x = parseInt(rowCount * Math.random()),
+            y = parseInt(rowCount * Math.random());
+        if (board[y][x] !== 9) {
+            board[y][x] = 9;
+            i++;
+        }
     }
 }
 
@@ -55,7 +73,8 @@ function mouseup(e) {
     if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
             && positionX < rowCount && positionY < rowCount) {
         // noinspection JSCheckFunctionSignatures
-        board[parseInt(position.y)][parseInt(position.x)] = 1;
+        showingCells[parseInt(position.y)][parseInt(position.x)] = true;
+        // board[parseInt(position.y)][parseInt(position.x)] = 1;
     }
 }
 
@@ -77,8 +96,11 @@ function getCellPositionFromClient(x, y) {
 }
 
 function render() {
-    context.fillStyle = "lightgray";
+    context.fillStyle = "#F9FFBD";
     context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "lightgray";
+    context.fillRect(gameX, gameY, gameHeight, gameHeight);
 
     let nowMousePosition = getCellPositionFromClient(nowMouseX, nowMouseY);
 
@@ -88,18 +110,23 @@ function render() {
             let positionX = parseInt(nowMousePosition.x),
                 positionY = parseInt(nowMousePosition.y);
 
-
             // noinspection JSCheckFunctionSignatures
             if (x === positionX && y === positionY
                     && !Object.is(positionX, -0) && !Object.is(positionY, -0)
                     && nowClick) {
-                context.fillStyle = "white";
+                context.fillStyle = "#FFFFFF";
                 context.fillRect(position.x, position.y, cellSize, cellSize)
             }
 
-            if (board[y][x] === 1) {
-                context.fillStyle = "black";
-                context.fillRect(position.x, position.y, cellSize, cellSize)
+            if (showingCells[y][x]) {
+                if (board[y][x] === 9) {
+                    // context.fillStyle = "black";
+                    // context.fillRect(position.x, position.y, cellSize, cellSize)
+                    context.drawImage(imageMine, position.x, position.y, cellSize, cellSize);
+                } else {
+                    context.fillStyle = "#F9FFBD";
+                    context.fillRect(position.x, position.y, cellSize, cellSize);
+                }
             }
         }
     }
