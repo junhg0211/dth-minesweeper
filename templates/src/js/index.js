@@ -4,6 +4,14 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
 const imageMine = document.getElementById("image-mine");
+const image1 = document.getElementById("image-1");
+const image2 = document.getElementById("image-2");
+const image3 = document.getElementById("image-3");
+const image4 = document.getElementById("image-4");
+const image5 = document.getElementById("image-5");
+const image6 = document.getElementById("image-6");
+const image7 = document.getElementById("image-7");
+const image8 = document.getElementById("image-8");
 
 let rowCount = 9, gameHeight;
 let gameX, gameY;
@@ -43,6 +51,31 @@ function boardInit() {
             i++;
         }
     }
+
+    for (let y = 0; y < rowCount; y++) {
+        for (let x = 0; x < rowCount; x++) {
+            if (board[y][x] === 9) continue;
+            let count = 0;
+            let upAvailable = y - 1 >= 0,
+                downAvailable = y + 1 < rowCount,
+                leftAvailable = x - 1 >= 0,
+                rightAvailable = x + 1 < rowCount;
+            if (leftAvailable) {
+                if (upAvailable) if (board[y - 1][x - 1] === 9) count++;
+                if (downAvailable) if (board[y + 1][x - 1] === 9) count++;
+                if (board[y][x - 1] === 9) count++;
+            }
+            if (rightAvailable) {
+                if (upAvailable) if (board[y - 1][x + 1] === 9) count++;
+                if (downAvailable) if (board[y + 1][x + 1] === 9) count++;
+                if (board[y][x + 1] === 9) count++;
+            }
+            if (upAvailable) if (board[y - 1][x] === 9) count++;
+            if (downAvailable) if (board[y + 1][x] === 9) count++;
+
+            board[y][x] = count;
+        }
+    }
 }
 
 boardInit();
@@ -69,12 +102,11 @@ function mouseup(e) {
     let nowMousePosition = getCellPositionFromClient(nowMouseX, nowMouseY);
     // noinspection JSCheckFunctionSignatures
     let positionX = parseInt(nowMousePosition.x),
-                positionY = parseInt(nowMousePosition.y);
+        positionY = parseInt(nowMousePosition.y);
     if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
-            && positionX < rowCount && positionY < rowCount) {
+        && positionX < rowCount && positionY < rowCount) {
         // noinspection JSCheckFunctionSignatures
         showingCells[parseInt(position.y)][parseInt(position.x)] = true;
-        // board[parseInt(position.y)][parseInt(position.x)] = 1;
     }
 }
 
@@ -112,8 +144,8 @@ function render() {
 
             // noinspection JSCheckFunctionSignatures
             if (x === positionX && y === positionY
-                    && !Object.is(positionX, -0) && !Object.is(positionY, -0)
-                    && nowClick) {
+                && !Object.is(positionX, -0) && !Object.is(positionY, -0)
+                && nowClick) {
                 context.fillStyle = "#FFFFFF";
                 context.fillRect(position.x, position.y, cellSize, cellSize)
             }
@@ -123,6 +155,22 @@ function render() {
                     // context.fillStyle = "black";
                     // context.fillRect(position.x, position.y, cellSize, cellSize)
                     context.drawImage(imageMine, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 8) {
+                    context.drawImage(image8, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 7) {
+                    context.drawImage(image7, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 6) {
+                    context.drawImage(image6, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 5) {
+                    context.drawImage(image5, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 4) {
+                    context.drawImage(image4, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 3) {
+                    context.drawImage(image3, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 2) {
+                    context.drawImage(image2, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 1) {
+                    context.drawImage(image1, position.x, position.y, cellSize, cellSize);
                 } else {
                     context.fillStyle = "#F9FFBD";
                     context.fillRect(position.x, position.y, cellSize, cellSize);
