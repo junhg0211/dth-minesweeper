@@ -105,6 +105,44 @@ function mousedown(e) {
 }
 
 /**
+ * With calling this function,
+ * any neighbor of `board[y][x] === 0` will recursively be showed by
+ * assigning `showingCells[y][x]` to `true`.
+ * @param x the anchor of finding this instance in x coordinate
+ * @param y the anchor of finding this instance in y coordinate
+ */
+function recursivelyShow(x, y) {
+    if (showingCells[y][x]) return;
+    else showingCells[y][x] = true;
+
+    if (board[y][x] !== 0) return;
+
+    let negativeX = false,
+        negativeY = false,
+        positiveX = false;
+
+    if (x - 1 >= 0) {
+        recursivelyShow(x - 1, y);
+        negativeX = true;
+    }
+    if (y - 1 >= 0) {
+        recursivelyShow(x, y - 1);
+        if (negativeX) recursivelyShow(x - 1, y - 1);
+        negativeY = true;
+    }
+    if (x + 1 < rowCount) {
+        recursivelyShow(x + 1, y);
+        if (negativeY) recursivelyShow(x + 1, y - 1);
+        positiveX = true;
+    }
+    if (y + 1 < rowCount) {
+        recursivelyShow(x, y + 1);
+        if (negativeX) recursivelyShow(x - 1, y + 1);
+        if (positiveX) recursivelyShow(x + 1, y + 1);
+    }
+}
+
+/**
  * The mouseup event handler.
  * @param e the mouseup event
  */
@@ -119,7 +157,7 @@ function mouseup(e) {
     if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
         && positionX < rowCount && positionY < rowCount) {
         // noinspection JSCheckFunctionSignatures
-        showingCells[parseInt(position.y)][parseInt(position.x)] = true;
+        recursivelyShow(parseInt(position.x), parseInt(position.y));
     }
 }
 
