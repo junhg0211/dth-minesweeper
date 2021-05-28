@@ -3,15 +3,11 @@ const fps = 30;
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
-const imageMine = document.getElementById("image-mine"),
-    image1 = document.getElementById("image-1"),
-    image2 = document.getElementById("image-2"),
-    image3 = document.getElementById("image-3"),
-    image4 = document.getElementById("image-4"),
-    image5 = document.getElementById("image-5"),
-    image6 = document.getElementById("image-6"),
-    image7 = document.getElementById("image-7"),
-    image8 = document.getElementById("image-8");
+const imageMine = document.getElementById("image-mine");
+const images = [];
+for (let i = 1; i <= 8; i++) {
+    images.push(document.getElementById(`image-${i}`));
+}
 
 let rowCount = 9,
     gameHeight;
@@ -154,26 +150,10 @@ function render() {
             }
 
             if (showingCells[y][x]) {
-                if (board[y][x] === 9) {
-                    // context.fillStyle = "black";
-                    // context.fillRect(position.x, position.y, cellSize, cellSize)
+                if (1 <= board[y][x] && board[y][x] <= 8) {
+                    context.drawImage(images[board[y][x] - 1], position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 9) {
                     context.drawImage(imageMine, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 8) {
-                    context.drawImage(image8, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 7) {
-                    context.drawImage(image7, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 6) {
-                    context.drawImage(image6, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 5) {
-                    context.drawImage(image5, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 4) {
-                    context.drawImage(image4, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 3) {
-                    context.drawImage(image3, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 2) {
-                    context.drawImage(image2, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 1) {
-                    context.drawImage(image1, position.x, position.y, cellSize, cellSize);
                 } else {
                     context.fillStyle = "#F9FFBD";
                     context.fillRect(position.x, position.y, cellSize, cellSize);
