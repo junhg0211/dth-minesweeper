@@ -3,18 +3,20 @@ const fps = 30;
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
-const imageMine = document.getElementById("image-mine");
-const image1 = document.getElementById("image-1");
-const image2 = document.getElementById("image-2");
-const image3 = document.getElementById("image-3");
-const image4 = document.getElementById("image-4");
-const image5 = document.getElementById("image-5");
-const image6 = document.getElementById("image-6");
-const image7 = document.getElementById("image-7");
-const image8 = document.getElementById("image-8");
+const imageMine = document.getElementById("image-mine"),
+    image1 = document.getElementById("image-1"),
+    image2 = document.getElementById("image-2"),
+    image3 = document.getElementById("image-3"),
+    image4 = document.getElementById("image-4"),
+    image5 = document.getElementById("image-5"),
+    image6 = document.getElementById("image-6"),
+    image7 = document.getElementById("image-7"),
+    image8 = document.getElementById("image-8");
 
-let rowCount = 9, gameHeight;
-let gameX, gameY;
+let rowCount = 9,
+    gameHeight;
+let gameX,
+    gameY;
 let cellSize;
 let mineCount = 10;
 
@@ -139,6 +141,7 @@ function render() {
     for (let y = 0; y < rowCount; y++) {
         for (let x = 0; x < rowCount; x++) {
             let position = getClientPositionFromCell(x, y);
+            // noinspection JSCheckFunctionSignatures
             let positionX = parseInt(nowMousePosition.x),
                 positionY = parseInt(nowMousePosition.y);
 
