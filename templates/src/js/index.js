@@ -166,7 +166,7 @@ function mouseup(e) {
     } else if (e.button === 2) {
         if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
             && positionX < rowCount && positionY && rowCount) {
-            board[positionY][positionX] = 10;
+            showingCells[positionY][positionX] = null;
         }
     }
 }
@@ -253,12 +253,12 @@ function render() {
                     context.drawImage(images[board[y][x] - 1], position.x, position.y, cellSize, cellSize);
                 } else if (board[y][x] === 9) {
                     context.drawImage(imageMine, position.x, position.y, cellSize, cellSize);
-                } else if (board[y][x] === 10) {
-                    context.drawImage(imageFri, position.x, position.y, cellSize, cellSize);
                 } else {
                     context.fillStyle = "#F9FFBD";
                     context.fillRect(position.x, position.y, cellSize, cellSize);
                 }
+            } else if (showingCells[y][x] === null) {
+                context.drawImage(imageFri, position.x, position.y, cellSize, cellSize);
             }
         }
     }
