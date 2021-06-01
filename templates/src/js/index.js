@@ -4,6 +4,7 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
 const imageMine = document.getElementById("image-mine");
+const imageFri = document.getElementById("image-fri");
 const images = [];
 for (let i = 1; i <= 8; i++) {
     images.push(document.getElementById(`image-${i}`));
@@ -101,7 +102,9 @@ function resize() {
  * @param e the mousedown event
  */
 function mousedown(e) {
-    nowClick = true;
+    if (e.button === 0) {
+        nowClick = true;
+    }
 }
 
 /**
@@ -147,17 +150,24 @@ function recursivelyShow(x, y) {
  * @param e the mouseup event
  */
 function mouseup(e) {
-    nowClick = false;
-
     let position = getCellPositionFromClient(e.clientX, e.clientY);
-    let nowMousePosition = getCellPositionFromClient(nowMouseX, nowMouseY);
-    // noinspection JSCheckFunctionSignatures
-    let positionX = parseInt(nowMousePosition.x),
-        positionY = parseInt(nowMousePosition.y);
-    if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
-        && positionX < rowCount && positionY < rowCount) {
+    let positionX = parseInt(position.x),
+        positionY = parseInt(position.y);
+
+    if (e.button === 0) {
+        nowClick = false;
+
         // noinspection JSCheckFunctionSignatures
-        recursivelyShow(parseInt(position.x), parseInt(position.y));
+        if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
+            && positionX < rowCount && positionY < rowCount) {
+            // noinspection JSCheckFunctionSignatures
+            recursivelyShow(positionX, positionY);
+        }
+    } else if (e.button === 2) {
+        if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
+            && positionX < rowCount && positionY && rowCount) {
+            board[positionY][positionX] = 10;
+        }
     }
 }
 
@@ -168,6 +178,14 @@ function mouseup(e) {
 function mousemove(e) {
     nowMouseX = e.clientX;
     nowMouseY = e.clientY;
+}
+
+/**
+ * A handler for preventing contextmenu opening and
+ * handling right click.
+ */
+function contextmenu(e) {
+    e.preventDefault();
 }
 
 /**
@@ -235,6 +253,8 @@ function render() {
                     context.drawImage(images[board[y][x] - 1], position.x, position.y, cellSize, cellSize);
                 } else if (board[y][x] === 9) {
                     context.drawImage(imageMine, position.x, position.y, cellSize, cellSize);
+                } else if (board[y][x] === 10) {
+                    context.drawImage(imageFri, position.x, position.y, cellSize, cellSize);
                 } else {
                     context.fillStyle = "#F9FFBD";
                     context.fillRect(position.x, position.y, cellSize, cellSize);
@@ -266,6 +286,7 @@ resize();
 window.addEventListener("mousedown", mousedown);
 window.addEventListener("mouseup", mouseup);
 window.addEventListener("mousemove", mousemove);
+window.addEventListener("contextmenu", contextmenu)
 
 setInterval(() => {
     tick();
