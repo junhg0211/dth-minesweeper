@@ -171,7 +171,57 @@ function mouseup(e) {
     if (e.button === 0) {
         nowClick = false;
         if (showingCells[positionY][positionX]) {
-            reveal(positionX, positionY);
+            let self = board[positionY][positionX],
+                mineCount = 0;
+
+            let negativeX = false,
+                negativeY = false,
+                positiveX = false,
+                positiveY = false;
+
+            if (positionX - 1 >= 0) {
+                if (showingCells[positionY][positionX - 1] === null) mineCount++;
+                negativeX = true;
+            }
+            if (positionY - 1 >= 0) {
+                if (showingCells[positionY - 1][positionX] === null) mineCount++;
+                if (negativeX && showingCells[positionY - 1][positionX - 1] === null) mineCount++;
+                negativeY = true;
+            }
+            if (positionX + 1 < rowCount) {
+                if (showingCells[positionY][positionX + 1] === null) mineCount++;
+                if (negativeY && showingCells[positionY - 1][positionX + 1] === null) mineCount++;
+                positiveX = true;
+            }
+            if (positionY + 1 < rowCount) {
+                if (showingCells[positionY + 1][positionX] === null) mineCount++;
+                if (negativeX && showingCells[positionY + 1][positionX - 1] === null) mineCount++;
+                if (positiveX && showingCells[positionY + 1][positionX + 1] === null) mineCount++;
+                positiveY = true;
+            }
+            
+            if (mineCount === board[positionY][positionX]) {
+                if (negativeX) {
+                    if (showingCells[positionY][positionX - 1] === false) recursivelyShow(positionX - 1, positionY);
+                }
+                if (positiveX) {
+                    if (showingCells[positionY][positionX + 1] === false) recursivelyShow(positionX + 1, positionY);
+                }
+                if (positiveY) {
+                    if (showingCells[positionY + 1][positionX] === false) recursivelyShow(positionX, positionY + 1);
+                    if (negativeX && showingCells[positionY + 1][positionX - 1] === false)
+                        recursivelyShow(positionX - 1, positionY + 1);
+                    if (positiveX && showingCells[positionY + 1][positionX + 1] === false)
+                        recursivelyShow(positionX + 1, positionY + 1);
+                }
+                if (negativeY) {
+                    if (showingCells[positionY - 1][positionX] === false) recursivelyShow(positionX, positionY - 1);
+                    if (negativeX && showingCells[positionY - 1][positionX - 1] === false)
+                        recursivelyShow(positionX - 1, positionY - 1);
+                    if (positiveX && showingCells[positionY - 1][positionX + 1] === false)
+                        recursivelyShow(positionX + 1, positionY - 1);
+                }
+            }
         } else if (showingCells[positionY][positionX] === false) {
             reveal(positionX, positionY);
         }
