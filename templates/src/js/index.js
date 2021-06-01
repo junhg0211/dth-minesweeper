@@ -146,27 +146,43 @@ function recursivelyShow(x, y) {
 }
 
 /**
+ * Recursively shows from this current mouse position
+ * under sure of mouse position is valid.
+ */
+function reveal(positionX, positionY) {
+    // noinspection JSCheckFunctionSignatures
+    if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
+        && positionX < rowCount && positionY < rowCount) {
+        // noinspection JSCheckFunctionSignatures
+        recursivelyShow(positionX, positionY);
+    }
+}
+
+/**
  * The mouseup event handler.
  * @param e the mouseup event
  */
 function mouseup(e) {
     let position = getCellPositionFromClient(e.clientX, e.clientY);
+    // noinspection JSCheckFunctionSignatures
     let positionX = parseInt(position.x),
         positionY = parseInt(position.y);
 
     if (e.button === 0) {
         nowClick = false;
-
-        // noinspection JSCheckFunctionSignatures
-        if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
-            && positionX < rowCount && positionY < rowCount) {
-            // noinspection JSCheckFunctionSignatures
-            recursivelyShow(positionX, positionY);
+        if (showingCells[positionY][positionX]) {
+            reveal(positionX, positionY);
+        } else if (showingCells[positionY][positionX] === false) {
+            reveal(positionX, positionY);
         }
     } else if (e.button === 2) {
         if (!Object.is(positionX, -0) && !Object.is(positionY, -0)
-            && positionX < rowCount && positionY && rowCount) {
-            showingCells[positionY][positionX] = null;
+            && positionX < rowCount && positionY < rowCount) {
+            if (showingCells[positionY][positionX] === null) {
+                showingCells[positionY][positionX] = false;
+            } else if (showingCells[positionY][positionX] === false) {
+                showingCells[positionY][positionX] = null;
+            }
         }
     }
 }
