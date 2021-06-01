@@ -171,8 +171,7 @@ function mouseup(e) {
     if (e.button === 0) {
         nowClick = false;
         if (showingCells[positionY][positionX]) {
-            let self = board[positionY][positionX],
-                mineCount = 0;
+            let mineCount = 0;
 
             let negativeX = false,
                 negativeY = false,
