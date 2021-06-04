@@ -26,6 +26,7 @@ let nowClick = false,
 
 let board,
     showingCells;
+let initialized = false;
 
 /**
  * `boardInit()` initializes the board.
@@ -79,6 +80,8 @@ function boardInit() {
             board[y][x] = count;
         }
     }
+
+    initialized = true;
 }
 
 boardInit();
@@ -222,6 +225,12 @@ function mouseup(e) {
                 }
             }
         } else if (showingCells[positionY][positionX] === false) {
+            if (initialized) {
+                while (board[positionY][positionX] !== 0) {
+                    boardInit();
+                }
+                initialized = false;
+            }
             reveal(positionX, positionY);
         }
     } else if (e.button === 2) {
