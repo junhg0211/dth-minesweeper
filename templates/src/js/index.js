@@ -1,4 +1,4 @@
-const fps = 30;
+const fps = 60;
 
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
@@ -27,6 +27,11 @@ let nowClick = false,
 let board,
     showingCells;
 let initialized = false;
+
+let screenshakeX = 0,
+    screenshakeY = 0,
+    screenshakeDelta = 0,
+    screenshakeFriction = Math.pow(80, 1/fps);
 
 /**
  * `boardInit()` initializes the board.
@@ -111,6 +116,14 @@ function mousedown(e) {
 }
 
 /**
+ * Envokes the screenshaking.
+ * @param delta how strong is the screenshaking
+ */
+function envokeScreenshake(delta) {
+    screenshakeDelta += delta;
+}
+
+/**
  * With calling this function,
  * any neighbor of `board[y][x] === 0` will recursively be showed by
  * assigning `showingCells[y][x]` to `true`.
@@ -121,7 +134,8 @@ function recursivelyShow(x, y) {
     if (showingCells[y][x]) return;
     else showingCells[y][x] = true;
 
-    if (board[y][x] !== 0) return;
+    if (board[y][x] === 9) envokeScreenshake(mineCount * 10);
+    else if (board[y][x] !== 0) return;
 
     let negativeX = false,
         negativeY = false,
@@ -268,7 +282,16 @@ function contextmenu(e) {
  * It mainly has responsibility for calculating variables for rendering the graphics.
  */
 function tick() {
-
+    if (screenshakeDelta !== 0) {
+        screenshakeX = (Math.random() * 2 - 1) * screenshakeDelta;
+        screenshakeY = (Math.random() * 2 - 1) * screenshakeDelta;
+        screenshakeDelta /= screenshakeFriction;
+        if (screenshakeDelta < 0.5) {
+            screenshakeDelta = 0;
+            screenshakeX = 0;
+            screenshakeY = 0;
+        }
+    }
 }
 
 /**
@@ -303,7 +326,7 @@ function render() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     context.fillStyle = "lightgray";
-    context.fillRect(gameX, gameY, gameHeight, gameHeight);
+    context.fillRect(gameX + screenshakeX, gameY + screenshakeY, gameHeight, gameHeight);
 
     let nowMousePosition = getCellPositionFromClient(nowMouseX, nowMouseY);
 
@@ -319,20 +342,20 @@ function render() {
                 && !Object.is(positionX, -0) && !Object.is(positionY, -0)
                 && nowClick) {
                 context.fillStyle = "#FFFFFF";
-                context.fillRect(position.x, position.y, cellSize, cellSize)
+                context.fillRect(position.x + screenshakeX, position.y + screenshakeY, cellSize, cellSize)
             }
 
             if (showingCells[y][x]) {
                 if (1 <= board[y][x] && board[y][x] <= 8) {
-                    context.drawImage(images[board[y][x] - 1], position.x, position.y, cellSize, cellSize);
+                    context.drawImage(images[board[y][x] - 1], position.x + screenshakeX, position.y + screenshakeY, cellSize, cellSize);
                 } else if (board[y][x] === 9) {
-                    context.drawImage(imageMine, position.x, position.y, cellSize, cellSize);
+                    context.drawImage(imageMine, position.x + screenshakeX, position.y + screenshakeY, cellSize, cellSize);
                 } else {
                     context.fillStyle = "#F9FFBD";
-                    context.fillRect(position.x, position.y, cellSize, cellSize);
+                    context.fillRect(position.x + screenshakeX, position.y + screenshakeY, cellSize, cellSize);
                 }
             } else if (showingCells[y][x] === null) {
-                context.drawImage(imageFri, position.x, position.y, cellSize, cellSize);
+                context.drawImage(imageFri, position.x + screenshakeX, position.y + screenshakeY, cellSize, cellSize);
             }
         }
     }
@@ -341,18 +364,18 @@ function render() {
         let position = getClientPositionFromCell(i, i);
 
         context.beginPath();
-        context.moveTo(position.x, gameY);
-        context.lineTo(position.x, gameY + gameHeight);
+        context.moveTo(position.x + screenshakeX, gameY + screenshakeY);
+        context.lineTo(position.x + screenshakeX, gameY + gameHeight + screenshakeY);
         context.stroke();
 
         context.beginPath();
-        context.moveTo(gameX, position.y);
-        context.lineTo(gameX + gameHeight, position.y);
+        context.moveTo(gameX + screenshakeX, position.y + screenshakeY);
+        context.lineTo(gameX + gameHeight + screenshakeX, position.y + screenshakeY);
         context.stroke();
     }
 
     context.strokeStyle = "black";
-    context.strokeRect(gameX, gameY, gameHeight, gameHeight);
+    context.strokeRect(gameX + screenshakeX, gameY + screenshakeY, gameHeight, gameHeight);
 }
 
 window.addEventListener("resize", resize);
