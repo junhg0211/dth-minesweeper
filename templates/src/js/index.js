@@ -104,6 +104,7 @@ function resize() {
     gameX = (canvas.width - gameHeight) / 2;
     gameY = (canvas.height - gameHeight) / 2;
 }
+resize();
 
 /**
  * The mousedown event handler.
@@ -379,11 +380,12 @@ function render() {
 }
 
 window.addEventListener("resize", resize);
-resize();
 window.addEventListener("mousedown", mousedown);
 window.addEventListener("mouseup", mouseup);
 window.addEventListener("mousemove", mousemove);
 window.addEventListener("contextmenu", contextmenu)
+
+context.imageSmoothingEnabled = false;
 
 setInterval(() => {
     tick();
