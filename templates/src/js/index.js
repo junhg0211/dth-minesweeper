@@ -103,6 +103,8 @@ function resize() {
 
     gameX = (canvas.width - gameHeight) / 2;
     gameY = (canvas.height - gameHeight) / 2;
+
+    context.imageSmoothingEnabled = false;
 }
 resize();
 
@@ -384,8 +386,6 @@ window.addEventListener("mousedown", mousedown);
 window.addEventListener("mouseup", mouseup);
 window.addEventListener("mousemove", mousemove);
 window.addEventListener("contextmenu", contextmenu)
-
-context.imageSmoothingEnabled = false;
 
 setInterval(() => {
     tick();
