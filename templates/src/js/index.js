@@ -33,6 +33,9 @@ let screenshakeX = 0,
     screenshakeY = 0,
     screenshakeDelta = 0,
     screenshakeFriction = Math.pow(80, 1 / fps);
+let bloodEffect = 0,
+    defaultBackgroundColor = [0xf9, 0xff, 0xbd],
+    backgroundColor = defaultBackgroundColor;
 
 let exploded = false,
     flagsPlaced = 0;
@@ -138,6 +141,7 @@ function explode() {
     if (!exploded) {
         exploded = true;
         evokeScreenshake(mineCount * 50);
+        bloodEffect = 1;
         for (let y = 0; y < rowCount; y++) {
             for (let x = 0; x < rowCount; x++) {
                 if (board[y][x] === 9 && showingCells[y][x] === false) {
@@ -305,6 +309,19 @@ function contextmenu(e) {
 }
 
 /**
+ * Maps value specific range to value specific range.
+ * @param value
+ * @param min
+ * @param max
+ * @param returnMin
+ * @param returnMax
+ * @returns {*}
+ */
+function map(value, min, max, returnMin, returnMax) {
+    return (value - min) / (max - min) * (returnMax - returnMin) + returnMin
+}
+
+/**
  * The loop ticker.
  * Every frame, `tick()` is called before `render()`.
  * It mainly has responsibility for calculating variables for rendering the graphics.
@@ -318,6 +335,18 @@ function tick() {
             screenshakeDelta = 0;
             screenshakeX = 0;
             screenshakeY = 0;
+        }
+    }
+
+    if (bloodEffect !== 0) {
+        backgroundColor = [
+            map(bloodEffect, 0, 1, defaultBackgroundColor[0], 0xff),
+            map(bloodEffect, 0, 1, defaultBackgroundColor[1], 0),
+            map(bloodEffect, 0, 1, defaultBackgroundColor[2], 0)
+        ];
+        bloodEffect /= screenshakeFriction;
+        if (bloodEffect < 0.01) {
+            bloodEffect = 0;
         }
     }
 
@@ -359,12 +388,21 @@ function getCellPositionFromClient(x, y) {
 }
 
 /**
+ * Converts list to a color string.
+ * @param color
+ * @returns {string}
+ */
+function convertColor(color) {
+    return `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+}
+
+/**
  * Renders the display.
  * Every frame, this is called after tick().
  * It mainly has responsibility of rendering variables to actual graphic.
  */
 function render() {
-    context.fillStyle = "#F9FFBD";
+    context.fillStyle = convertColor(backgroundColor);
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     context.fillStyle = "lightgray";
