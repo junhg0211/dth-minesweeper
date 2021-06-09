@@ -10,12 +10,13 @@ for (let i = 1; i <= 8; i++) {
     images.push(document.getElementById(`image-${i}`));
 }
 
+const mineCount = 10;
+
 let rowCount = 9,
     gameHeight;
 let gameX,
     gameY;
 let cellSize;
-let mineCount = 10;
 
 let horizontalPadding = 120,
     verticalPadding = 50;
@@ -31,7 +32,10 @@ let initialized = false;
 let screenshakeX = 0,
     screenshakeY = 0,
     screenshakeDelta = 0,
-    screenshakeFriction = Math.pow(80, 1/fps);
+    screenshakeFriction = Math.pow(80, 1 / fps);
+
+let exploded = false,
+    flagsPlaced = 0;
 
 /**
  * `boardInit()` initializes the board.
@@ -106,6 +110,7 @@ function resize() {
 
     context.imageSmoothingEnabled = false;
 }
+
 resize();
 
 /**
@@ -119,11 +124,29 @@ function mousedown(e) {
 }
 
 /**
- * Envokes the screenshaking.
+ * Evokes the screenshaking.
  * @param delta how strong is the screenshaking
  */
-function envokeScreenshake(delta) {
+function evokeScreenshake(delta) {
     screenshakeDelta += delta;
+}
+
+/**
+ * Proceeds explosion of all the mines.
+ */
+function explode() {
+    if (!exploded) {
+        exploded = true;
+        evokeScreenshake(mineCount * 50);
+        for (let y = 0; y < rowCount; y++) {
+            for (let x = 0; x < rowCount; x++) {
+                if (board[y][x] === 9 && showingCells[y][x] === false) {
+                    recursivelyShow(x, y)
+                }
+                showingCells[y][x] = true;
+            }
+        }
+    }
 }
 
 /**
@@ -137,7 +160,7 @@ function recursivelyShow(x, y) {
     if (showingCells[y][x]) return;
     else showingCells[y][x] = true;
 
-    if (board[y][x] === 9) envokeScreenshake(mineCount * 10);
+    if (board[y][x] === 9) explode();
     else if (board[y][x] !== 0) return;
 
     let negativeX = false,
@@ -218,7 +241,7 @@ function mouseup(e) {
                 if (positiveX && showingCells[positionY + 1][positionX + 1] === null) mineCount++;
                 positiveY = true;
             }
-            
+
             if (mineCount === board[positionY][positionX]) {
                 if (negativeX) {
                     if (showingCells[positionY][positionX - 1] === false) recursivelyShow(positionX - 1, positionY);
@@ -255,8 +278,10 @@ function mouseup(e) {
             && positionX < rowCount && positionY < rowCount) {
             if (showingCells[positionY][positionX] === null) {
                 showingCells[positionY][positionX] = false;
+                flagsPlaced--;
             } else if (showingCells[positionY][positionX] === false) {
                 showingCells[positionY][positionX] = null;
+                flagsPlaced++;
             }
         }
     }
@@ -293,6 +318,20 @@ function tick() {
             screenshakeDelta = 0;
             screenshakeX = 0;
             screenshakeY = 0;
+        }
+    }
+
+    if (mineCount === flagsPlaced) {
+        let corrects = 0;
+        for (let y = 0; y < rowCount; y++) {
+            for (let x = 0; x < rowCount; x++) {
+                if (board[y][x] === 9 && showingCells[y][x] === null) {
+                    corrects++;
+                }
+            }
+        }
+        if (corrects === flagsPlaced) {
+
         }
     }
 }
