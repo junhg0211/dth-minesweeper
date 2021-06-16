@@ -10,6 +10,8 @@ for (let i = 1; i <= 8; i++) {
     images.push(document.getElementById(`image-${i}`));
 }
 
+const notification = document.getElementById("notification");
+
 const mineCount = 10;
 
 let rowCount = 9,
@@ -39,6 +41,8 @@ let bloodEffect = 0,
 
 let exploded = false,
     flagsPlaced = 0;
+
+let startTime;
 
 /**
  * `boardInit()` initializes the board.
@@ -94,6 +98,8 @@ function boardInit() {
     }
 
     initialized = true;
+
+    startTime = new Date();
 }
 
 boardInit();
@@ -142,6 +148,8 @@ function explode() {
         exploded = true;
         evokeScreenshake(mineCount * 50);
         bloodEffect = 1;
+        notify("으악!", "지뢰를 눌렀습니다...");
+
         for (let y = 0; y < rowCount; y++) {
             for (let x = 0; x < rowCount; x++) {
                 if (board[y][x] === 9 && showingCells[y][x] === false) {
@@ -360,7 +368,8 @@ function tick() {
             }
         }
         if (corrects === flagsPlaced) {
-
+            notify("성공!", `모든 지뢰를 알맞게 찾아냈습니다. 시간: ${(new Date() - startTime) / 1000}초`);
+            flagsPlaced = 0;
         }
     }
 }
@@ -456,6 +465,23 @@ function render() {
 
     context.strokeStyle = "black";
     context.strokeRect(gameX + screenshakeX, gameY + screenshakeY, gameHeight, gameHeight);
+}
+
+/**
+ * Removes the notification window.
+ */
+function removeNotification() {
+    notification.style.display = "none";
+}
+removeNotification();
+
+/**
+ * Shows the notification window with contents.
+ */
+function notify(title, content) {
+    notification.children[0].textContent = title;
+    notification.children[1].textContent = content;
+    notification.style.display = "block";
 }
 
 window.addEventListener("resize", resize);
