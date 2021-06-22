@@ -148,7 +148,7 @@ function explode() {
         exploded = true;
         evokeScreenshake(mineCount * 50);
         bloodEffect = 1;
-        notify("으악!", "지뢰를 눌렀습니다...");
+        notify("으악!", "지뢰를 찾았습니다...");
 
         for (let y = 0; y < rowCount; y++) {
             for (let x = 0; x < rowCount; x++) {
